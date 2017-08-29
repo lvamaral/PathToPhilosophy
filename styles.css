@@ -7,3 +7,12 @@ html, body {
   height: 100%;
   width: 100%;
 }
+
+h1, .hop-div, .hop-list {
+  width: 300px;
+  margin: 0 auto;
+}
+
+.hop-list {
+  list-style-type: none;
+}

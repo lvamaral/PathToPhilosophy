@@ -1,4 +1,4 @@
-var q = "Greece";
+var q = "Latin";
 var seen = [];
 var count = 0;
 
@@ -14,16 +14,22 @@ function followLink(query){
     //Get first Paragraph
     var firstP = $('p', content)[0];
 
-    //Select first link
-    var firstA = $('a', firstP)[0];
+    //Select first link that works
+    var i = 0
+    var firstA = $('a', firstP)[i];
+    while (!linkWorks(firstA)) {
+      i += 1;
+      firstA = $('a', firstP)[i];
+    }
+
     var nextLink = $(firstA).attr("title");
     if (!seen.includes(nextLink)) {
       if (nextLink === "Philosophy") {
+        list.append($(`<li>Philosophy</li>`));
         list.append($(`<li>Reached Philosophy!</li>`));
       } else {
         seen.push(nextLink);
         count += 1;
-        console.log(seen);
         followLink(nextLink);
       }
     } else {
@@ -33,4 +39,32 @@ function followLink(query){
   });
 }
 
-followLink(q);
+function linkWorks(a){
+  var url = $(a).attr('href');
+  //Check if its not a meta page, not from wikitionary, and is a wiki
+  var linkOk = url.indexOf('Help:') === -1 &&
+    url.indexOf('File:') === -1 &&
+    url.indexOf('Wikipedia:') === -1 &&
+    url.indexOf('wiktionary.org/') === -1 &&
+    url.indexOf('/wiki/') !== -1;
+    if (linkOk) {
+    //Check if the link is between parenthesis
+    var contentHtml = $(a).closest('p').length > 0 ? $(a).closest('p').html() : '';
+    if (contentHtml !== '') {
+      var linkHtml = 'href="' + url + '"';
+      var contentBeforeLink = contentHtml.split(linkHtml)[0];
+      var openParenthesisCount = contentBeforeLink.split('(').length - 1;
+      var closeParenthesisCount = contentBeforeLink.split(')').length - 1;
+      linkOk = openParenthesisCount <= closeParenthesisCount;
+    }
+  }
+
+  if (linkOk) {
+    // Check that the link is not in italic
+    linkOk = $(a).parents('i').length === 0;
+  }
+
+  return linkOk;
+}
+
+// followLink(q);

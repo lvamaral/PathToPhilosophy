@@ -3,15 +3,49 @@
   border: 0;
 }
 
+*:focus {
+    outline: none;
+}
+
 html, body {
   height: 100%;
   width: 100%;
+  background-color: black;
+  color: white;
+}
+
+h1 {
+  font-size: 60px;
+}
+header {
+  padding: 10px 0;
 }
 
 h1, .hop-div, .hop-list {
-  width: 300px;
+  width: 600px;
   margin: 0 auto;
+  text-align: center;
 }
+
+.hop-div input {
+  height: 50px;
+  font-size: 25px;
+  border-radius: 25px;
+  background-color: black;
+  color: white;
+}
+
+#text-input {
+  width: 200px;
+  margin: 0 auto;
+  border-bottom: 10px solid white;
+}
+
+#button-input {
+
+}
+
+
 
 .hop-list {
   list-style-type: none;

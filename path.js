@@ -16,7 +16,8 @@ function followLink(query){
       var content = Object.values(data.parse.text)[0].replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {return "<img no_load_src=\"" +capture+ "\" />";});
 
       let firstA;
-      var firstP = $('p', content).eq(0);
+      var firstP = $('p', content);
+      console.log("firstp", firstP);
 
       if (firstP.text() === "Redirect to:"){
         //Handles redirection
@@ -25,11 +26,13 @@ function followLink(query){
         //Select first link that works
         var i = 0;
         var allA = $('a', firstP);
+        console.log("allA", allA, "len", allA.length);
         firstA = allA.eq(i);
         while (!linkWorks(firstA)) {
           i += 1;
           firstA = allA.eq(i);
           if (i > allA.length) {
+            console.log(allA);
             firstA = allA.eq(0);
             break;
           }
@@ -37,7 +40,7 @@ function followLink(query){
       }
 
       var nextLink = $(firstA).attr("title");
-      // console.log("next", nextLink);
+      console.log("next", nextLink);
       if (!$seen.includes(nextLink)) {
         if (nextLink === "Philosophy") {
           list.append($(`<li class="list-item">Philosophy</li>`));
@@ -82,7 +85,7 @@ function linkWorks(a){
   }
 
   if (linkWorks) {
-    // Check that the link is not in italic
+    // Check that the link is not in italic by selecting <i> parents
     linkWorks = $(a).parents('i').length === 0;
   }
 

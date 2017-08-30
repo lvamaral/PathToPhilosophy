@@ -29,14 +29,15 @@ function followLink(query){
         while (!linkWorks(firstA)) {
           i += 1;
           firstA = allA.eq(i);
-          if (i >= allA.length) {
+          if (i > allA.length) {
+            firstA = allA.eq(0);
             break;
           }
         }
       }
 
       var nextLink = $(firstA).attr("title");
-      console.log("next", nextLink);
+      // console.log("next", nextLink);
       if (!$seen.includes(nextLink)) {
         if (nextLink === "Philosophy") {
           list.append($(`<li class="list-item">Philosophy</li>`));
@@ -55,34 +56,37 @@ function followLink(query){
 }
 
 function linkWorks(a){
-  if (!a || !$(a).attr('href') || $(a).attr("title") === "Definition" || !$(a).attr("title")) {
+  if (!a ||
+    !$(a).attr('href') ||
+    $(a).attr("title") === "Definition" ||
+    !$(a).attr("title")) {
     return false;
   }
   var url = $(a).attr('href');
   //Check if its not a meta page, not from wikitionary, and is a wiki
-  var linkOk = url.indexOf('Help:') === -1 &&
+  var linkWorks = url.indexOf('Help:') === -1 &&
     url.indexOf('File:') === -1 &&
     url.indexOf('Wikipedia:') === -1 &&
     url.indexOf('wiktionary.org/') === -1 &&
     url.indexOf('/wiki/') !== -1;
-    if (linkOk) {
+    if (linkWorks) {
     //Check if the link is between parenthesis
     var contentHtml = $(a).closest('p').length > 0 ? $(a).closest('p').html() : '';
     if (contentHtml !== '') {
       var linkHtml = 'href="' + url + '"';
       var contentBeforeA = contentHtml.split(linkHtml)[0];
-      var openParenthesisCount = contentBeforeA.split('(').length - 1;
-      var closeParenthesisCount = contentBeforeA.split(')').length - 1;
-      linkOk = openParenthesisCount <= closeParenthesisCount;
+      var openParenCount = contentBeforeA.split('(').length - 1;
+      var closeParenCount = contentBeforeA.split(')').length - 1;
+      linkWorks = openParenCount <= closeParenCount;
     }
   }
 
-  if (linkOk) {
+  if (linkWorks) {
     // Check that the link is not in italic
-    linkOk = $(a).parents('i').length === 0;
+    linkWorks = $(a).parents('i').length === 0;
   }
 
-  return linkOk;
+  return linkWorks;
 }
 
 $("#button-input").click(()=>{

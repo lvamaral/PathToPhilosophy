@@ -21,10 +21,18 @@ header {
   padding: 10px 0;
 }
 
+header h2 {
+  float: right;
+}
+
 h1, .hop-div, .hop-list {
   width: 600px;
   margin: 0 auto;
   text-align: center;
+}
+
+.input-div {
+  margin-bottom: 20px;
 }
 
 .hop-div input {
@@ -36,17 +44,34 @@ h1, .hop-div, .hop-list {
 }
 
 #text-input {
+  padding-left: 5px;
   width: 200px;
   margin: 0 auto;
   border-bottom: 10px solid white;
 }
 
-#button-input {
-
+.list-item {
+  text-align: center;
+  font-size: 25px;
+  line-height: 30px;
+  height: 30px;
 }
 
+.list-item:first-letter{
+  text-transform:capitalize;
+}
 
+.red {
+  color: red;
+}
 
 .hop-list {
+  padding: 0;
   list-style-type: none;
+  height: 100%;
+  overflow-y: auto;
+}
+
+h2 {
+  border-top: 1px solid white;
 }

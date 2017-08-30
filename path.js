@@ -1,45 +1,63 @@
-var q = "Latin";
-var seen = [];
-var count = 0;
+var $seen = [];
+var $count = 0;
 
 function followLink(query){
   $.getJSON(`https://en.wikipedia.org/w/api.php?action=parse&page=${query}&prop=text&origin=*&format=json`, function(data){
     //Place Hop Into List
     var list = $(".hop-list");
-    list.append($(`<li>${query}</li>`));
-
-    //Get content and clean images to avoid GET calls
-    var content = Object.values(data.parse.text)[0].replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {return "<img no_load_src=\"" +capture+ "\" />";});
-
-    //Get first Paragraph
-    var firstP = $('p', content)[0];
-
-    //Select first link that works
-    var i = 0
-    var firstA = $('a', firstP)[i];
-    while (!linkWorks(firstA)) {
-      i += 1;
-      firstA = $('a', firstP)[i];
+    if (query) {
+      list.append($(`<li class="list-item">${query}</li>`));
     }
 
-    var nextLink = $(firstA).attr("title");
-    if (!seen.includes(nextLink)) {
-      if (nextLink === "Philosophy") {
-        list.append($(`<li>Philosophy</li>`));
-        list.append($(`<li>Reached Philosophy!</li>`));
-      } else {
-        seen.push(nextLink);
-        count += 1;
-        followLink(nextLink);
-      }
+    if (data.error) {
+      alert("That query does not work");
     } else {
-      list.append($(`<li>STOPPED DUE TO LOOP</li>`));
-    }
+      //Get content and clean images to avoid GET calls
+      var content = Object.values(data.parse.text)[0].replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {return "<img no_load_src=\"" +capture+ "\" />";});
 
+      let firstA;
+      var firstP = $('p', content).eq(0);
+
+      if (firstP.text() === "Redirect to:"){
+        //Handles redirection
+        firstA = $('a', content);
+      } else {
+        //Select first link that works
+        var i = 0;
+        var allA = $('a', firstP);
+        firstA = allA.eq(i);
+        while (!linkWorks(firstA)) {
+          i += 1;
+          firstA = allA.eq(i);
+          if (i >= allA.length) {
+            break;
+          }
+        }
+      }
+
+      var nextLink = $(firstA).attr("title");
+      console.log("next", nextLink);
+      if (!$seen.includes(nextLink)) {
+        if (nextLink === "Philosophy") {
+          list.append($(`<li class="list-item">Philosophy</li>`));
+          list.append($(`<li class="list-item red">Reached Philosophy!</li>`));
+        } else {
+          $seen.push(nextLink);
+          $count += 1;
+          $('h2').text(`Hops: ${$count}`);
+          followLink(nextLink);
+        }
+      } else {
+        list.append($(`<li class="list-item red">STOPPED DUE TO LOOP (${nextLink})</li>`));
+      }
+    }
   });
 }
 
 function linkWorks(a){
+  if (!a || !$(a).attr('href') || $(a).attr("title") === "Definition" || !$(a).attr("title")) {
+    return false;
+  }
   var url = $(a).attr('href');
   //Check if its not a meta page, not from wikitionary, and is a wiki
   var linkOk = url.indexOf('Help:') === -1 &&
@@ -52,9 +70,9 @@ function linkWorks(a){
     var contentHtml = $(a).closest('p').length > 0 ? $(a).closest('p').html() : '';
     if (contentHtml !== '') {
       var linkHtml = 'href="' + url + '"';
-      var contentBeforeLink = contentHtml.split(linkHtml)[0];
-      var openParenthesisCount = contentBeforeLink.split('(').length - 1;
-      var closeParenthesisCount = contentBeforeLink.split(')').length - 1;
+      var contentBeforeA = contentHtml.split(linkHtml)[0];
+      var openParenthesisCount = contentBeforeA.split('(').length - 1;
+      var closeParenthesisCount = contentBeforeA.split(')').length - 1;
       linkOk = openParenthesisCount <= closeParenthesisCount;
     }
   }
@@ -67,4 +85,12 @@ function linkWorks(a){
   return linkOk;
 }
 
-// followLink(q);
+$("#button-input").click(()=>{
+  $(".list-item").remove();
+  $seen = [];
+  $count = 0;
+  $('h2').text(`Hops: ${$count}`);
+  var query = $('#text-input').val();
+  followLink(query);
+  $('h2').show();
+});

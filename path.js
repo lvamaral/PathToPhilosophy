@@ -16,9 +16,9 @@ function followLink(query){
       var content = Object.values(data.parse.text)[0].replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {return "<img no_load_src=\"" +capture+ "\" />";});
 
       let firstA;
+
+      //Select first paragraph
       var firstP = $('p', content);
-
-
       if (firstP.text() === "Redirect to:"){
         //Handles redirection
         firstA = $('a', content);
@@ -32,7 +32,7 @@ function followLink(query){
           i += 1;
           firstA = allA.eq(i);
           if (i > allA.length) {
-        
+
             firstA = allA.eq(0);
             break;
           }
@@ -67,12 +67,12 @@ function linkWorks(a){
   }
   var url = $(a).attr('href');
   //Check if its not a meta page, not from wikitionary, and is a wiki
-  var linkWorks = url.indexOf('Help:') === -1 &&
+  var aWorks = url.indexOf('Help:') === -1 &&
     url.indexOf('File:') === -1 &&
     url.indexOf('Wikipedia:') === -1 &&
     url.indexOf('wiktionary.org/') === -1 &&
     url.indexOf('/wiki/') !== -1;
-    if (linkWorks) {
+    if (aWorks) {
     //Check if the link is between parenthesis
     var contentHtml = $(a).closest('p').length > 0 ? $(a).closest('p').html() : '';
     if (contentHtml !== '') {
@@ -80,16 +80,16 @@ function linkWorks(a){
       var contentBeforeA = contentHtml.split(linkHtml)[0];
       var openParenCount = contentBeforeA.split('(').length - 1;
       var closeParenCount = contentBeforeA.split(')').length - 1;
-      linkWorks = openParenCount <= closeParenCount;
+      aWorks = openParenCount <= closeParenCount;
     }
   }
 
-  if (linkWorks) {
+  if (aWorks) {
     // Check that the link is not in italic by selecting <i> parents
-    linkWorks = $(a).parents('i').length === 0;
+    aWorks = $(a).parents('i').length === 0;
   }
 
-  return linkWorks;
+  return aWorks;
 }
 
 $("#button-input").click(()=>{
